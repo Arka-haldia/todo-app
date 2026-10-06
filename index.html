@@ -12,13 +12,16 @@ h1{text-align:center;margin:0 0 20px;color:#333}
 .input-box{display:flex;gap:10px;margin-bottom:20px}
 #taskInput{flex:1;padding:14px;border-radius:12px;border:2px solid #eee;outline:none;font-size:16px}
 #taskInput:focus{border-color:#667eea}
-button.add{background:#667eea;color:white;border:none;padding:0 22px;border-radius:12px;font-weight:600;cursor:pointer}
-.task{background:#f7f7ff;padding:12px 16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+button.add{background:#667eea;color:white;border:none;padding:0 22px;border-radius:12px;font-weight:600;cursor:pointer;transition:0.2s}
+button.add:active{transform:scale(0.95)}
+.task{background:#f7f7ff;padding:12px 16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;transition:all 0.4s ease;overflow:hidden}
+.task.delete-anim{transform:translateX(100%);opacity:0;height:0;padding:0 16px;margin:0}
 .task-left{display:flex;align-items:center;gap:10px;flex:1}
-.task-left input{width:20px;height:20px}
-.task-text{flex:1}
+.task-left input{width:20px;height:20px;accent-color:#667eea}
+.task-text{flex:1;transition:0.2s}
 .strike{text-decoration:line-through;color:#888;opacity:0.7}
-.del{color:#ff4d4d;background:none;border:none;font-size:18px;cursor:pointer;font-weight:bold}
+.del{color:#ff4d4d;background:none;border:none;font-size:18px;cursor:pointer;font-weight:bold;transition:0.2s}
+.del:hover{transform:scale(1.3)}
 .footer{text-align:center;margin-top:20px;font-size:12px;color:#888}
 </style>
 </head>
@@ -41,6 +44,7 @@ for(let i=0;i<tasks.length;i++){
 let t=tasks[i];
 let div=document.createElement('div');
 div.className='task';
+div.id='task-'+i;
 let left=document.createElement('div');
 left.className='task-left';
 let chk=document.createElement('input');
@@ -70,7 +74,19 @@ inp.value='';
 render();
 }
 function toggleTask(i){tasks[i].done=!tasks[i].done;render();}
-function delTask(i){tasks.splice(i,1);render();}
+function delTask(i){
+let el=document.getElementById('task-'+i);
+if(el){
+el.classList.add('delete-anim');
+setTimeout(function(){
+tasks.splice(i,1);
+render();
+},400);
+}else{
+tasks.splice(i,1);
+render();
+}
+}
 document.getElementById('taskInput').addEventListener('keypress',function(e){if(e.key==='Enter')addTask();});
 render();
 </script>
