@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Arka's To-Do</title>
+<title>Arka's To-Do Pro</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 body{margin:0;min-height:100vh;font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;justify-content:center;align-items:center;padding:20px}
-.card{background:rgba(255,255,255,0.95);width:100%;max-width:420px;border-radius:20px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2)}
+.card{background:#fff;width:100%;max-width:420px;border-radius:20px;padding:30px;box-shadow:0 20px 40px rgba(0,0,0,0.2)}
 h1{text-align:center;margin:0 0 20px;color:#333}
 .input-box{display:flex;gap:10px;margin-bottom:20px}
 #taskInput{flex:1;padding:14px;border-radius:12px;border:2px solid #eee;outline:none;font-size:16px}
 #taskInput:focus{border-color:#667eea}
 button.add{background:#667eea;color:white;border:none;padding:0 22px;border-radius:12px;font-weight:600;cursor:pointer}
 .task{background:#f7f7ff;padding:12px 16px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.task-left{display:flex;align-items:center;gap:12px;flex:1}
-.task-left input{width:20px;height:20px;accent-color:#667eea}
+.task-left{display:flex;align-items:center;gap:10px;flex:1}
+.task-left input{width:20px;height:20px}
 .task-text{flex:1}
-.done.task-text{text-decoration:line-through;color:#888}
+.strike{text-decoration:line-through;color:#888;opacity:0.7}
 .del{color:#ff4d4d;background:none;border:none;font-size:18px;cursor:pointer;font-weight:bold}
 .footer{text-align:center;margin-top:20px;font-size:12px;color:#888}
 </style>
@@ -26,24 +26,41 @@ button.add{background:#667eea;color:white;border:none;padding:0 22px;border-radi
 <div class="card">
 <h1>✨ My Tasks</h1>
 <div class="input-box">
-<input id="taskInput" placeholder="New task likho..." />
+<input id="taskInput" placeholder="New task likho...">
 <button class="add" onclick="addTask()">Add</button>
 </div>
 <div id="taskList"></div>
 <div class="footer">Made with ❤️ by Arka</div>
 </div>
 <script>
-let tasks=JSON.parse(localStorage.getItem('tasks-v2')||'[]');
+let tasks=JSON.parse(localStorage.getItem('my-tasks')||'[]');
 function render(){
 let list=document.getElementById('taskList');
 list.innerHTML='';
-tasks.forEach((t,i)=>{
+for(let i=0;i<tasks.length;i++){
+let t=tasks[i];
 let div=document.createElement('div');
-div.className='task'+(t.done?' done':'');
-div.innerHTML=`<div class="task-left"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${i})"><span class="task-text">${t.text}</span></div><button class="del" onclick="delTask(${i})">X</button>`;
+div.className='task';
+let left=document.createElement('div');
+left.className='task-left';
+let chk=document.createElement('input');
+chk.type='checkbox';
+chk.checked=t.done;
+chk.onchange=(function(idx){return function(){toggleTask(idx)}})(i);
+let span=document.createElement('span');
+span.className='task-text'+(t.done?' strike':'');
+span.textContent=t.text;
+left.appendChild(chk);
+left.appendChild(span);
+let del=document.createElement('button');
+del.className='del';
+del.textContent='X';
+del.onclick=(function(idx){return function(){delTask(idx)}})(i);
+div.appendChild(left);
+div.appendChild(del);
 list.appendChild(div);
-});
-localStorage.setItem('tasks-v2',JSON.stringify(tasks));
+}
+localStorage.setItem('my-tasks',JSON.stringify(tasks));
 }
 function addTask(){
 let inp=document.getElementById('taskInput');
@@ -54,7 +71,7 @@ render();
 }
 function toggleTask(i){tasks[i].done=!tasks[i].done;render();}
 function delTask(i){tasks.splice(i,1);render();}
-document.getElementById('taskInput').addEventListener('keypress',e=>{if(e.key==='Enter')addTask()});
+document.getElementById('taskInput').addEventListener('keypress',function(e){if(e.key==='Enter')addTask();});
 render();
 </script>
 </body>
